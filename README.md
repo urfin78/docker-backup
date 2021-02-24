@@ -1,4 +1,6 @@
 ### Docker Backup scripts
+
 ## docker-mysqldump.sh
 Backup Databases
-works only with passwords as secrets this time (swarm mode).
+
+Reads passwords or secrets from env variables of running containers and dumps compressed sql-db to target directory.
