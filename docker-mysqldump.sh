@@ -10,7 +10,7 @@ for CONTAINER in $(docker ps --format '{{.ID}}'); do
 		DBPW=$(echo ${ENVDATA}|grep -oE 'MYSQL_PASSWORD(|_FILE)=.*'|sed -E 's/^MYSQL_PASSWORD(|_FILE)=([^ ]+).*/\2/') 
 		if [[ "$(echo ${ENVDATA}|grep -oE 'MYSQL_DATABASE_FILE')" ]]; then
 			PREPAREENV+='DB=$(cat '${DB}');'
-			DBASE="$(docker exec -it ${CONTAINER} /bin/bash -c ''"${PREPAREENV}"' echo ${DB}')"
+			DBASE="$(docker exec ${CONTAINER} /bin/bash -c ''"${PREPAREENV}"' echo ${DB}')"
 		else
 			PREPAREENV+='DB='${DB}';'
 			DBASE="${DB}"
