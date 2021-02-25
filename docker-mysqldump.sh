@@ -26,7 +26,7 @@ for CONTAINER in $(docker ps --format '{{.ID}}'); do
 			PREPAREENV+='DBPW='${DBPW}';'
 		fi
 
-		docker exec -it ${CONTAINER} /bin/bash -c ''"${PREPAREENV}"' mysqldump --single-transaction -n -c -e --hex-blob -R -u ${DBUSER} -p${DBPW} ${DB}' | bzip2 -c > ${TARGETDIR}/${DBASE}-${DATE}.sql.bz2
+		docker exec ${CONTAINER} /bin/bash -c ''"${PREPAREENV}"' mysqldump --single-transaction -n -c -e --hex-blob -R -u ${DBUSER} -p${DBPW} ${DB}' | bzip2 -c > ${TARGETDIR}/${DBASE}-${DATE}.sql.bz2
 		PREPAREENV=''
 	fi 
 done
