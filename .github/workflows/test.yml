@@ -16,7 +16,7 @@ jobs:
         echo "MYSQL_RANDOM_ROOT_PASSWORD=true" >> .env
         docker run --name dbase --rm -d --env-file=.env mariadb:10.4
         sleep 30
-        docker exec --env-file=.env dbase mysql -u ${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} -e "create table tbl(name varchar(20),age int); insert into tbl(name,age) values ("bob", 25);"
+        docker exec --env-file=.env dbase /bin/bash -c 'mysql -u ${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} -e "create table tbl(name varchar(20),age int); insert into tbl(name,age) values ("bob", 25);"'
         docker-mysqldump.sh
         ls -lha
 
