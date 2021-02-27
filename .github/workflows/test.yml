@@ -49,4 +49,5 @@ jobs:
 
     - name: test
       run: |
-        docker exec dbasetest /bin/bash -c 'mysql -u test -ptest dbasetest -e "select * from tbl;"'
+        apt-get install -y mysql-client
+        mysql -u test -ptest dbasetest -e "select * from tbl"
