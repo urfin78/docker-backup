@@ -38,6 +38,8 @@ jobs:
           MYSQL_USER: test
           MYSQL_PASSWORD: test
           MYSQL_DATABASE: dbasetest
+        ports:
+          - 3306
         volumes:
           - initsql:/docker-entrypoint-initdb.d
 
@@ -48,6 +50,7 @@ jobs:
         path: initsql
 
     - name: test
+      env:
+        PORT: ${{ job.services.mariadb.ports[3306] }}
       run: |
-        sudo apt-get install -y mysql-client
-        mysql -u test -ptest dbasetest -e "select * from tbl"
+        mysql -u test -ptest -h 127.0.0.1 -P "${PORT}" dbasetest -e "select * from tbl"
