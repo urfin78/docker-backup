@@ -6,10 +6,6 @@ jobs:
     name: dump mysqldb
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/upload-artifact@v2
-      with:
-        name: sqldump
-        path: "*.gz"
     - name: checkout
       uses: actions/checkout@v2
 
@@ -24,8 +20,12 @@ jobs:
         docker exec --env-file=.env dbaseorig /bin/bash -c 'mysql -u ${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} -e "create table tbl(name varchar(20),age int); insert into tbl(name,age) values (\"bob\", 25);"'
         ./docker-mysqldump.sh
         docker stop dbaseorig
-      
-        
+    - name: upload dbase
+      uses: actions/upload-artifact@v2
+      with:
+        name: sqldump
+        path: "*.gz"
+   
   test:
     name: import and test mysqldb
     runs-on: ubuntu-latest
