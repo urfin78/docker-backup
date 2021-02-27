@@ -49,5 +49,5 @@ jobs:
 
     - name: test
       run: |
-        apt-get install -y mysql-client
+        sudo apt-get install -y mysql-client
         mysql -u test -ptest dbasetest -e "select * from tbl"
