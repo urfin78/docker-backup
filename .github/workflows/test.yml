@@ -10,9 +10,9 @@ jobs:
 
     - name: dump
       uses: actions/upload-artifact@v2
-        with:
-          name: sqldump
-          path: *.gz
+      with:
+        name: sqldump
+        path: *.gz
       run: |
         echo "MYSQL_DATABASE=$(date | md5sum|head -c16)" > .env
         echo "MYSQL_USER=$(date | md5sum|head -c16)" >> .env
@@ -26,9 +26,9 @@ jobs:
   test:
     name: import and test mysqldb
       uses: actions/download-artifact@v2
-        with:
-          name: sqldump
-          path: initsql
+      with:
+        name: sqldump
+        path: initsql
     needs: dump
     runs-on: ubuntu-latest
     services:
