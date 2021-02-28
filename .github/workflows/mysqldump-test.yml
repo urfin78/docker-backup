@@ -1,16 +1,6 @@
-name: Test script
+name: MySQLdump-Test
 on: [ push, pull_request]
-
 jobs:
-  lint:
-    name: shellcheck
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: shellcheck files
-      uses: ludeeus/action-shellcheck@master
-
-
   initsql:
     name: create init sql script
     runs-on: ubuntu-latest
