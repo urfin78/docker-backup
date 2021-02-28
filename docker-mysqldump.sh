@@ -1,5 +1,6 @@
 #!/bin/bash
-set -x
+set -o errexit
+set -o nounset
 DATE=$(date +"%Y%m%d-%H%M%S")
 TARGETDIR='.'
 PREPAREENV=''
