@@ -8,7 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: shellcheck files
-      uses: ludeeus/action-shellcheck@v1
+      uses: ludeeus/action-shellcheck@master
 
   dump:
     name: dump mysqldb
