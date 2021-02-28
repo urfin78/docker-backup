@@ -75,7 +75,7 @@ jobs:
     - name: create secrets and env-file
       run: |
         date | md5sum|head -c16 | docker secret create mysqldb -
-        date | md5sum|head -c16 | docker secret create mysquser -
+        date | md5sum|head -c16 | docker secret create mysqluser -
         date | md5sum|head -c16 | docker secret create mysqlpw -
         echo "MYSQL_DATABASE_FILE=/run/secrets/mysqldb" > .env
         echo "MYSQL_USER_FILE=/run/secrets/mysqluser" >> .env
