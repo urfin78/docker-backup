@@ -9,6 +9,7 @@ for CONTAINER in $(docker ps --format '{{.ID}}'); do
 		DBUSER=$(echo "${ENVDATA}"|grep -oE 'MYSQL_USER(|_FILE)=.*'|sed -E 's/^MYSQL_USER(|_FILE)=([^ ]+).*/\2/')
 		DBPW=$(echo "${ENVDATA}"|grep -oE 'MYSQL_PASSWORD(|_FILE)=.*'|sed -E 's/^MYSQL_PASSWORD(|_FILE)=([^ ]+).*/\2/') 
 		if echo "${ENVDATA}"|grep -qoE 'MYSQL_DATABASE_FILE'; then
+			#shellcheck disable=SC2016
 			PREPAREENV+='DB=$(cat '${DB}');'
 			DBASE=$(docker exec "${CONTAINER}" /bin/bash -c ''"${PREPAREENV}"' echo ${DB}')
 		else
