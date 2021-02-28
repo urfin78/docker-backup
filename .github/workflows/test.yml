@@ -96,7 +96,7 @@ jobs:
         path: "*.gz"
    
   testdump:
-    name: import and test mysqldb from swarm
+    name: import and test mysqldb
     runs-on: ubuntu-latest
     needs: dump
     services:
@@ -126,7 +126,7 @@ jobs:
         mysql -u test -ptest -h 127.0.0.1 -P "${PORT}" dbasetest -e "select * from tbl"
 
   testdumpswarm:
-    name: import and test mysqldb
+    name: import and test mysqldb from swarm
     runs-on: ubuntu-latest
     needs: dumpswarm
     services:
