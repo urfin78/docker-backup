@@ -79,12 +79,11 @@ jobs:
         date | md5sum|head -c16 | docker secret create mysquser -
         date | md5sum|head -c16 | docker secret create mysqlpw -
         echo "MYSQL_DATABASE_FILE=/run/secrets/mysqldb" > .env
-        echo "MYSQL_USER_FILE=/run/secrets/mysqluser >> .env
+        echo "MYSQL_USER_FILE=/run/secrets/mysqluser" >> .env
         echo "MYSQL_PASSWORD_FILE=/run/secrets/mysqlpw" >> .env
         echo "MYSQL_RANDOM_ROOT_PASSWORD=true" >> .env
     - name: create service
       run: |
-        echo 
         docker service create --name dbaseswarm --env-file .env --mount type=bind,source=${GITHUB_WORKSPACE}/initsql,destination=/docker-entrypoint-initdb.d  --secret source=mysqldb --secret mysqluser --secret mysqlpw mariadb:10.4
         sleep 30
     - name: dump using script
