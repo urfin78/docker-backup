@@ -2,12 +2,19 @@ name: Test script
 on: [ push, pull_request]
 
 jobs:
+  lint:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: shellcheck files
+      uses: ludeeus/action-shellcheck@v1
+
   dump:
     name: dump mysqldb
     runs-on: ubuntu-latest
     steps:
-    - name: checkout
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
     - name: dump
       run: |
