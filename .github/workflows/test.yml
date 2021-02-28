@@ -37,7 +37,7 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: initsql
-        path: ${GITHUB_WORKSPACE}/initsql
+        path: initsql
 
     - name: create database
       run: |
@@ -45,7 +45,7 @@ jobs:
         echo "MYSQL_USER=$(date | md5sum|head -c16)" >> .env
         echo "MYSQL_PASSWORD=$(date | md5sum|head -c16)" >> .env
         echo "MYSQL_RANDOM_ROOT_PASSWORD=true" >> .env
-        docker run --name dbaseorig --rm -d -v ${GITHUB_WORKSPACE}/initsql:/docker-entrypoint-initdb.d --env-file=.env mariadb:10.4
+        docker run --name dbaseorig --rm -d -v ${GITHUB_WORKSPACE}/initsql/:/docker-entrypoint-initdb.d --env-file=.env mariadb:10.4
         sleep 30
         
     - name: dump using script
@@ -67,7 +67,13 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: initsql
-        path: ${GITHUB_WORKSPACE}/initsql
+        path: initsql
+    
+    - name: debug
+      run: |
+        env
+        pwd
+        ls -lha ${GITHUB_WORKSPACE}/initsql/
 
     - name: init swarm
       run: |
@@ -83,7 +89,7 @@ jobs:
         echo "MYSQL_RANDOM_ROOT_PASSWORD=true" >> .env
     - name: create service
       run: |
-        docker service create --name dbaseswarm --env-file .env --mount type=bind,source=${GITHUB_WORKSPACE}/initsql,destination=/docker-entrypoint-initdb.d  --secret source=mysqldb --secret source=mysqluser --secret source=mysqlpw mariadb:10.4
+        docker service create --name dbaseswarm --env-file .env --mount type=bind,source=${GITHUB_WORKSPACE}/initsql/,destination=/docker-entrypoint-initdb.d  --secret source=mysqldb --secret source=mysqluser --secret source=mysqlpw mariadb:10.4
         sleep 30
     - name: dump using script
       run: |
