@@ -49,7 +49,7 @@ jobs:
         
     - name: dump using script
       run: |
-        sleep 30
+        sleep 60
         ./docker-mysqldump.sh
     - name: upload dbase
       uses: actions/upload-artifact@v2
@@ -86,7 +86,7 @@ jobs:
         docker service create --name dbaseswarm --env-file .env --mount type=bind,source=${GITHUB_WORKSPACE}/initsql/,destination=/docker-entrypoint-initdb.d  --secret source=mysqldb --secret source=mysqluser --secret source=mysqlpw mariadb:10.4
     - name: dump using script
       run: |
-        sleep 30
+        sleep 60
         ./docker-mysqldump.sh        
     
     - name: upload dbase
