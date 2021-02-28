@@ -45,7 +45,7 @@ jobs:
         echo "MYSQL_USER=$(date | md5sum|head -c16)" >> .env
         echo "MYSQL_PASSWORD=$(date | md5sum|head -c16)" >> .env
         echo "MYSQL_RANDOM_ROOT_PASSWORD=true" >> .env
-        docker run --name dbaseorig --rm -d -v ${GITHUB_WORKSPACE}/initsql/:/docker-entrypoint-initdb.d --env-file=.env mariadb:10.4
+        docker run --name dbaseorig --rm -d -v ${GITHUB_WORKSPACE}/initsql:/docker-entrypoint-initdb.d --env-file=.env mariadb:10.4
         
     - name: dump using script
       run: |
@@ -83,7 +83,7 @@ jobs:
         echo "MYSQL_RANDOM_ROOT_PASSWORD=true" >> .env
     - name: create service
       run: |
-        docker service create --name dbaseswarm --env-file .env --mount type=bind,source=${GITHUB_WORKSPACE}/initsql/,destination=/docker-entrypoint-initdb.d  --secret source=mysqldb --secret source=mysqluser --secret source=mysqlpw mariadb:10.4
+        docker service create --name dbaseswarm --env-file .env --mount type=bind,source=${GITHUB_WORKSPACE}/initsql,destination=/docker-entrypoint-initdb.d  --secret source=mysqldb --secret source=mysqluser --secret source=mysqlpw mariadb:10.4
     - name: dump using script
       run: |
         sleep 60
