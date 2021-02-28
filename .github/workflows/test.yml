@@ -88,6 +88,8 @@ jobs:
       run: |
         sleep 60
         ./docker-mysqldump.sh        
+        docker ps -a
+        ls -lha .
     
     - name: upload dbase
       uses: actions/upload-artifact@v2
