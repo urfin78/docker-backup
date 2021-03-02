@@ -105,7 +105,7 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: sqldump
-        path: ${GITHUB_WORKSPACE}/sqldump
+        path: sqldump
 
     - name: import dump
       run: |
@@ -135,11 +135,11 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: sqldumpswarm
-        path: ${GITHUB_WORKSPACE}/sqldump
+        path: sqldumpswarm
 
     - name: import dump
       run: |
-        gunzip < "$(find ${GITHUB_WORKSPACE}/sqldump -name '*.sql.gz')" | mysql -u test -ptest -h 127.0.0.1 -P "${{ job.services.mariadb.ports[3306] }}" dbasetest
+        gunzip < "$(find ${GITHUB_WORKSPACE}/sqldumpswarm -name '*.sql.gz')" | mysql -u test -ptest -h 127.0.0.1 -P "${{ job.services.mariadb.ports[3306] }}" dbasetest
 
     - name: test
       run: |
