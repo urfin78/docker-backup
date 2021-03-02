@@ -1,5 +1,12 @@
 name: MySQLdump-Test
-on: [ push, pull_request]
+on: 
+  push:
+    paths:
+    - 'docker-mysqldump.sh'
+  pull-request:
+    paths:
+    - 'docker-mysqldump.sh'
+
 jobs:
   initsql:
     name: create init sql script
