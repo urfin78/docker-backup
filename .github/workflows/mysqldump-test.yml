@@ -99,8 +99,6 @@ jobs:
           MYSQL_DATABASE: dbasetest
         ports:
           - 3306
-        volumes:
-          - ${GITHUB_WORKSPACE}/sqldump:/docker-entrypoint-initdb.d
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
@@ -108,6 +106,10 @@ jobs:
       with:
         name: sqldump
         path: ${GITHUB_WORKSPACE}/sqldump
+
+    - name: import dump
+      run: |
+        gunzip < "${GITHUB_WORKSPACE}/sqldump/*.sql.gz" | mysql -u test -ptest -h 127.0.0.1 -P "${PORT}" dbasetest
 
     - name: test
       env:
@@ -129,8 +131,6 @@ jobs:
           MYSQL_DATABASE: dbasetest
         ports:
           - 3306
-        volumes:
-          - ${GITHUB_WORKSPACE}/sqldump:/docker-entrypoint-initdb.d
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
@@ -138,6 +138,10 @@ jobs:
       with:
         name: sqldumpswarm
         path: ${GITHUB_WORKSPACE}/sqldump
+
+    - name: import dump
+      run: |
+        gunzip < "${GITHUB_WORKSPACE}/sqldump/*.sql.gz" | mysql -u test -ptest -h 127.0.0.1 -P "${PORT}" dbasetest
 
     - name: test
       env:
