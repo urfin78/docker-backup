@@ -109,13 +109,11 @@ jobs:
 
     - name: import dump
       run: |
-        gunzip < "${GITHUB_WORKSPACE}/sqldump/*.sql.gz" | mysql -u test -ptest -h 127.0.0.1 -P "${PORT}" dbasetest
+        gunzip < "$(find ${GITHUB_WORKSPACE}/sqldump -name '*.sql.gz')" | mysql -u test -ptest -h 127.0.0.1 -P "${{ job.services.mariadb.ports[3306] }}" dbasetest
 
     - name: test
-      env:
-        PORT: ${{ job.services.mariadb.ports[3306] }}
       run: |
-        mysql -u test -ptest -h 127.0.0.1 -P "${PORT}" dbasetest -e "select * from tbl"
+        mysql -u test -ptest -h 127.0.0.1 -P "${{ job.services.mariadb.ports[3306] }}" dbasetest -e "select * from tbl"
 
   testdumpswarm:
     name: import and test mysqldb from swarm
@@ -141,10 +139,8 @@ jobs:
 
     - name: import dump
       run: |
-        gunzip < "${GITHUB_WORKSPACE}/sqldump/*.sql.gz" | mysql -u test -ptest -h 127.0.0.1 -P "${PORT}" dbasetest
+        gunzip < "$(find ${GITHUB_WORKSPACE}/sqldump -name '*.sql.gz')" | mysql -u test -ptest -h 127.0.0.1 -P "${{ job.services.mariadb.ports[3306] }}" dbasetest
 
     - name: test
-      env:
-        PORT: ${{ job.services.mariadb.ports[3306] }}
       run: |
-        mysql -u test -ptest -h 127.0.0.1 -P "${PORT}" dbasetest -e "select * from tbl"
+        mysql -u test -ptest -h 127.0.0.1 -P "${{ job.services.mariadb.ports[3306] }}" dbasetest -e "select * from tbl"
