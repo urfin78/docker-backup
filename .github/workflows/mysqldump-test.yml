@@ -3,7 +3,7 @@ on:
   push:
     paths:
     - 'docker-mysqldump.sh'
-  pull-request:
+  pull_request:
     paths:
     - 'docker-mysqldump.sh'
 
