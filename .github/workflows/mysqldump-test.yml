@@ -1,0 +1,146 @@
+name: MySQLdump-Test
+on: [ push, pull_request]
+jobs:
+  initsql:
+    name: create init sql script
+    runs-on: ubuntu-latest
+    steps:
+      - name: create sql file
+        run: |
+          echo "DROP TABLE IF EXISTS tbl;" > init.sql
+          echo "CREATE TABLE tbl (name varchar(20),age int);" >> init.sql
+          echo "INSERT INTO tbl (name,age) VALUES ('Bob', 25);" >> init.sql
+      - name: upload initsql
+        uses: actions/upload-artifact@v2
+        with:
+          name: initsql
+          path: "init.sql"
+
+  dump:
+    name: dump mysqldb
+    runs-on: ubuntu-latest
+    needs: initsql
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: initsql
+        path: initsql
+
+    - name: create database
+      run: |
+        echo "MYSQL_DATABASE=$(date | md5sum|head -c16)" > .env
+        echo "MYSQL_USER=$(date | md5sum|head -c16)" >> .env
+        echo "MYSQL_PASSWORD=$(date | md5sum|head -c16)" >> .env
+        echo "MYSQL_RANDOM_ROOT_PASSWORD=true" >> .env
+        docker run --name dbaseorig --rm -d -v ${GITHUB_WORKSPACE}/initsql:/docker-entrypoint-initdb.d --env-file=.env mariadb:10.4
+        sleep 60
+        
+    - name: dump using script
+      run: |
+        ./docker-mysqldump.sh
+    - name: upload dbase
+      uses: actions/upload-artifact@v2
+      with:
+        name: sqldump
+        path: "*.gz"
+  
+  dumpswarm:
+    name: dump mysqldb on swarm
+    runs-on: ubuntu-latest
+    needs: initsql
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: initsql
+        path: initsql
+    
+    - name: init swarm
+      run: |
+        docker swarm init
+    - name: create secrets and env-file
+      run: |
+        date | md5sum|head -c16 | docker secret create mysqldb -
+        date | md5sum|head -c16 | docker secret create mysqluser -
+        date | md5sum|head -c16 | docker secret create mysqlpw -
+        echo "MYSQL_DATABASE_FILE=/run/secrets/mysqldb" > .env
+        echo "MYSQL_USER_FILE=/run/secrets/mysqluser" >> .env
+        echo "MYSQL_PASSWORD_FILE=/run/secrets/mysqlpw" >> .env
+        echo "MYSQL_RANDOM_ROOT_PASSWORD=true" >> .env
+    - name: create service
+      run: |
+        docker service create --name dbaseswarm --env-file .env --mount type=bind,source=${GITHUB_WORKSPACE}/initsql,destination=/docker-entrypoint-initdb.d  --secret source=mysqldb --secret source=mysqluser --secret source=mysqlpw mariadb:10.4
+        sleep 60
+    - name: dump using script
+      run: |
+        ./docker-mysqldump.sh        
+    
+    - name: upload dbase
+      uses: actions/upload-artifact@v2
+      with:
+        name: sqldumpswarm
+        path: "*.gz"
+   
+  testdump:
+    name: import and test mysqldb
+    runs-on: ubuntu-latest
+    needs: dump
+    services:
+      mariadb:
+        image: mariadb:10.4
+        env:
+          MYSQL_RANDOM_ROOT_PASSWORD: true
+          MYSQL_USER: test
+          MYSQL_PASSWORD: test
+          MYSQL_DATABASE: dbasetest
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: sqldump
+        path: sqldump
+
+    - name: import dump
+      run: |
+        gunzip < "$(find ${GITHUB_WORKSPACE}/sqldump -name '*.sql.gz')" | mysql -u test -ptest -h 127.0.0.1 -P "${{ job.services.mariadb.ports[3306] }}" dbasetest
+
+    - name: test
+      run: |
+        mysql -u test -ptest -h 127.0.0.1 -P "${{ job.services.mariadb.ports[3306] }}" dbasetest -e "select * from tbl"
+
+  testdumpswarm:
+    name: import and test mysqldb from swarm
+    runs-on: ubuntu-latest
+    needs: dumpswarm
+    services:
+      mariadb:
+        image: mariadb:10.4
+        env:
+          MYSQL_RANDOM_ROOT_PASSWORD: true
+          MYSQL_USER: test
+          MYSQL_PASSWORD: test
+          MYSQL_DATABASE: dbasetest
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: sqldumpswarm
+        path: sqldumpswarm
+
+    - name: import dump
+      run: |
+        gunzip < "$(find ${GITHUB_WORKSPACE}/sqldumpswarm -name '*.sql.gz')" | mysql -u test -ptest -h 127.0.0.1 -P "${{ job.services.mariadb.ports[3306] }}" dbasetest
+
+    - name: test
+      run: |
+        mysql -u test -ptest -h 127.0.0.1 -P "${{ job.services.mariadb.ports[3306] }}" dbasetest -e "select * from tbl"
