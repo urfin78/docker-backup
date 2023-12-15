@@ -19,7 +19,7 @@ jobs:
           echo "CREATE TABLE tbl (name varchar(20),age int);" >> init.sql
           echo "INSERT INTO tbl (name,age) VALUES ('Bob', 25);" >> init.sql
       - name: upload initsql
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: initsql
           path: "init.sql"
@@ -50,7 +50,7 @@ jobs:
       run: |
         ./docker-mysqldump.sh
     - name: upload dbase
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: sqldump
         path: "*.gz"
@@ -88,7 +88,7 @@ jobs:
         ./docker-mysqldump.sh        
     
     - name: upload dbase
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: sqldumpswarm
         path: "*.gz"
